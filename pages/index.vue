@@ -1,7 +1,53 @@
 <template>
-  <Tutorial/>
+  <div>
+    <h1>Events</h1>
+  
+    <EventCard
+          v-for="(event, index) in events"
+          :key="index"
+          :event="event"
+          :data-index="index"
+        />
+  </div>
+
+  
 </template>
 
 <script>
-export default {}
+import { mapState } from 'vuex'
+import EventCard from '@/components/EventCard.vue';
+export default {
+  components: {
+    EventCard,
+  },
+  async fetch({ store, error }) {
+    try {
+      await store.dispatch('events/fetchEvents')
+
+    } catch (e) {
+      error({
+        statusCode: 503,
+        message: "Unable to fetch events at this time."
+      })
+    }
+  },
+  head() { // <-- property used by vue-meta to add header tags
+    return {
+      title: 'Event Listing - Real World Events', // <-- For our title tag
+      meta: [
+        {
+          hid: 'description',
+          name: 'description', // <-- for our meta description tag
+          content:
+            'Where you can find all the events taking place in your neighborhood'
+        }
+      ]
+    }
+  },
+  computed: mapState({
+    events: state => state.events.events
+  })
+
+
+}
 </script>
